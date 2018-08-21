@@ -1,0 +1,29 @@
+<!-- css -->
+<style>
+	.question-status {
+		display:inline-block;
+		padding:5px;
+		background-color:#ccc;
+		font-weight:bold;
+		margin:5px;
+		width:2em;
+		text-align:center;
+		border-radius:3px;
+		cursor:pointer;
+	}
+</style>
+
+<!-- template -->
+<script type="text/x-template" id="template-question-status">
+	<div class="question-status" v-on:click="$emit('question-status-clicked', question)">
+		{{ question.num }}
+	</div>
+</script>
+
+<!-- javascript -->
+<script>
+Vue.component('question-status', {
+	props: ['question'],
+	template: "#template-question-status"
+})
+</script>

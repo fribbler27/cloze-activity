@@ -1,0 +1,51 @@
+<!-- css -->
+<style>
+	.question-part-outer {
+		display:inline;
+	}
+
+	.question-part {
+		display:inline;
+	}
+</style>
+
+<!-- template -->
+<script type="text/x-template" id="template-question-part">
+	<div class="question-part-outer">
+		<div class="question-part" v-if="type=='html'">
+			{{ text }}
+		</div>
+		<div class="question-part" v-if="type=='blank' && choices.length==1">
+			<question-blank-single
+				v-bind:choice="choices[0]"
+			></question-blank-single>
+		</div>
+		<div class="question-part" v-if="type=='blank' && choices.length>1">
+			<question-blank-multiple
+				v-bind:choices="choices"
+			></question-blank-multiple>
+		</div>
+	</div>
+</script>
+
+<!-- javascript -->
+<script>
+Vue.component('question-part', {
+	data: function() { return {
+		'text': { 'type': String, 'required': true },
+		'type': { 'type': String, 'required': true },
+		'choices': { 'type': Array }
+	}},
+	props: {
+		'part':{ 'type': Object, 'required': true }
+	},
+	template: "#template-question-part",
+	created: function() {
+		this.text = this.part.text;
+		this.type = this.part.type;
+		if (this.type == 'blank') {
+			this.choices = this.text.split(/\s*\|\s*/);
+		}
+	}
+})
+</script>

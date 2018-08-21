@@ -1,0 +1,83 @@
+<!-- css -->
+<style>
+	.question-blank-multiple {
+		display:inline;
+	}
+
+	.question-blank-multiple select {
+		display:inline-block;
+		width:100px;
+		margin-left:3px;
+		margin-right:3px;
+		text-align:center;
+	}
+
+	.question-blank-multiple select.not_started {
+		background-color:#ffc;
+	}
+
+	.question-blank-multiple select.started {
+		background-color:#ccf;
+	}
+
+	.question-blank-multiple select.incorrect {
+		background-color:#fcc;
+	}
+
+	.question-blank-multiple select.complete {
+		background-color:#cfc;
+	}
+
+</style>
+
+<!-- template -->
+<script type="text/x-template" id="template-question-blank-multiple">
+	<div class="question-blank-multiple">
+		<select class="form-control" v-model="response" @change="onChange()" :class="status">
+			<option value="x" selected></option>
+			<option v-for="choice, index in choice_options" :value="index">{{ choice }}</option>
+		</select>
+	</div>
+</script>
+
+<!-- javascript -->
+<script>
+Vue.component('question-blank-multiple', {
+	data: function() { return {
+		'choice_options': { 'type': Array, 'required': true },
+		'correct_choice': { 'type': String },
+		'response': { 'type': String },
+		'status': { 'type': String }
+	}},
+	props: {
+		'choices':{ 'type': Array, 'required': true }
+	},
+	template: "#template-question-blank-multiple",
+	created: function() {
+		this.correct_choice = '';
+		this.response = 'x';
+		this.status = 'not_started';
+		this.choice_options = [];
+		for (var i = 0; i < this.choices.length; ++i) {
+			var choice = this.choices[i];
+			if (choice.search(/^\*(.*)/) == 0) {
+				this.choice_options.push(RegExp.$1);
+				this.correct_choice = i;
+			} else {
+				this.choice_options.push(choice);
+			}
+		}
+	},
+	methods: {
+		onChange: function() {
+			console.log(this.response);
+			this.status = 'started';
+			if (empty(this.correct_choice) || this.response == this.correct_choice) {
+				this.status = 'complete';
+			} else if (!empty(this.response) && this.response != this.correct_choice) {
+				this.status = 'incorrect';
+			}
+		}
+	}
+})
+</script>

@@ -1,0 +1,144 @@
+<!-- css -->
+<style>
+	.question-blank-single {
+		display:inline;
+	}
+
+	.question-blank-single input {
+		display:inline-block;
+		width:100px;
+		margin-left:3px;
+		margin-right:3px;
+		text-align:center;
+		font: 18px Courier;
+		letter-spacing: 3px;
+		/* the following two make the cursor invisible */
+		color: transparent !important;
+		text-shadow: 0 0 0 black !important;
+	}
+
+	.question-blank-single input.not_started {
+		background-color:#ffc;
+	}
+
+	.question-blank-single input.started {
+		background-color:#ccf;
+	}
+
+	.question-blank-single input.incorrect {
+		background-color:#fcc;
+	}
+
+	.question-blank-single input.complete {
+		background-color:#cfc;
+	}
+
+	.key-status-correct-new {
+		font-weight:bold;
+		color: green;
+	}
+
+	.key-status-correct-old {
+		font-weight:bold;
+		color: blue;
+	}
+
+	.key-status-incorrect {
+		font-weight:bold;
+		color: red;
+	}
+
+</style>
+
+<!-- template -->
+<script type="text/x-template" id="template-question-blank-single">
+	<div class="question-blank-single">
+		<input type="text" class="form-control" v-model="response" :class="status" @keydown="onKeyDown($event)" ref="blank">
+	</div>
+</script>
+
+<!-- javascript -->
+<script>
+Vue.component('question-blank-single', {
+	data: function() { return {
+		'response': { 'type': String, 'required': true },
+		'choice_uc': { 'type': String, 'required': true },
+		'status': { 'type': String }
+	}},
+	props: {
+		'choice':{ 'type': String, 'required': true }
+	},
+	template: "#template-question-blank-single",
+	created: function() {
+		this.status = 'not_started';
+		this.choice_uc = this.choice.toUpperCase();
+		this.response = '';
+		for (var i = 0; i < this.choice.length; ++i) {
+			// if (i > 0) this.response += ' ';
+			this.response += '_';
+		}
+	},
+	methods: {
+		onKeyDown: function(e) {
+			var key = e.which;
+
+			// see if the key is a letter or number; convert to upper case
+			key = String.fromCharCode(key).toUpperCase();
+			if ((key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9') || key == '.' || key == '-') {
+				this.check_key(key);
+			}
+			// ignore other keypresses
+
+			// we don't want to let the keydown actually do anything in the input field
+			e.preventDefault();
+		},
+
+		check_key: function(key) {
+			var key_status;
+			// key is in choice_uc...
+			if (this.choice_uc.indexOf(key) > -1) {
+				// then if key isn't yet in response, fill it in to response
+				if (this.response.indexOf(key) == -1) {
+					key_status = 'correct-new';
+					var new_response = '';
+					for (var i = 0; i < this.choice_uc.length; ++i) {
+						if (this.choice_uc[i] == key) {
+							new_response += key;
+							// as soon as we get a correct keypress, status changes to "started"
+							this.status = 'started';
+						} else {
+							new_response += this.response[i];
+						}
+					}
+					this.response = new_response;
+				} else {
+					key_status = 'correct-old';
+				}
+
+				// if this.response = this.choice_uc, we're done
+				if (this.response == this.choice_uc) {
+					this.status = "complete";
+				}
+			} else {
+				key_status = 'incorrect';
+			}
+
+			// show a popover indicating the key_status
+			$(this.$refs.blank).popover('dispose')
+			.popover({
+				'html': true,
+				'placement': 'bottom',
+				'trigger': 'manual',
+				'content': sr('<span class="key-status-$1">$2</span>', key_status, key)
+			}).popover('show');
+
+			// set a timeout to hide the popover, clearing any previously-set timeout first
+			if (!empty(this.poto)) clearTimeout(this.poto);
+			this.poto = setTimeout(function() {
+				$(this.$refs.blank).popover('dispose');
+				this.poto = null;
+			}.bind(this), 1000);
+		}
+	}
+})
+</script>

@@ -1,0 +1,36 @@
+<!-- css -->
+<style>
+	.question-editor {
+		margin:10px 0;
+	}
+
+	.question-editor b {
+		display:inline-block;
+		vertical-align:top;
+		padding-top:3px;
+	}
+
+	.question-editor textarea {
+		display:inline-block;
+		width:90%;
+		height:4em;
+		font-size:16px;
+		font-family:Courier;
+		margin-left:10px;
+	}
+</style>
+
+<!-- template -->
+<script type="text/x-template" id="template-question-editor">
+	<div class="question-editor">
+		<b>{{ question.num }}.</b><textarea v-model="question.text"></textarea>
+	</div>
+</script>
+
+<!-- javascript -->
+<script>
+Vue.component('question-editor', {
+	props: ['question'],
+	template: "#template-question-editor"
+})
+</script>

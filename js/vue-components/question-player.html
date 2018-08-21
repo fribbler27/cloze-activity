@@ -1,0 +1,55 @@
+<!-- css -->
+<style>
+	.question-player {
+	}
+</style>
+
+<!-- template -->
+<script type="text/x-template" id="template-question-player">
+	<div class="question-player card mt-4" v-show="question.showing">
+		<div class="card-header">
+			<h3>Question {{ question.num }}</h3>
+		</div>
+		<div class="card-body">
+			<question-part
+				v-for="part in parts"
+				v-bind:key="part.index"
+				v-bind:part="part"
+			></question-part>
+		</div>
+	</div>
+</script>
+
+<!-- javascript -->
+<script>
+Vue.component('question-player', {
+	data: function() { return {
+		parts: {
+			'type': Array,
+			'required': true
+		}
+	}},
+	props: {
+		'question':{
+			'type': Object,
+			'required': true
+		}
+	},
+	template: "#template-question-player",
+	created: function() {
+		console.log("Question " + this.question.num + " created");
+
+		// split question text into parts, dividing by [[ or ]]
+		this.parts = [];
+		var arr = this.question.text.split(/\[\[|\]\]/);
+		for (var i = 0; i < arr.length; ++i) {
+			this.parts.push({
+				'text': arr[i],
+				'index': i,
+				'type': (i%2==0) ? 'html' : 'blank'
+			});
+		}
+
+	}
+})
+</script>
